@@ -10,7 +10,11 @@ if [ -f ".venv/bin/activate" ]; then
     echo "✅ Virtual environment activated"
     echo "📦 Available tools:"
     echo "   • databricks --version: $(databricks --version 2>/dev/null || echo 'not found')"
-    echo "   • terraform --version: $(terraform --version 2>/dev/null | head -1 || echo 'not found')"
+    if [ -f ".venv/bin/terraform" ]; then
+        echo "   • terraform --version: $(.venv/bin/terraform --version 2>/dev/null | head -1 || echo 'not found')"
+    else
+        echo "   • terraform --version: $(terraform --version 2>/dev/null | head -1 || echo 'not found')"
+    fi
     echo "   • python --version: $(python --version 2>/dev/null || echo 'not found')"
     echo ""
     echo "💡 To deactivate: run 'deactivate'"

@@ -148,41 +148,62 @@ install_dependencies() {
         pip install databricks-cli python-terraform
     fi
 
-    # Check for Terraform and install if needed
-    if ! command -v terraform &> /dev/null; then
-        print_progress "Installing Terraform..."
+    # Check for Terraform and install if needed (always install in venv)
+    TERRAFORM_IN_VENV=".venv/bin/terraform"
+    if [ ! -f "$TERRAFORM_IN_VENV" ]; then
+        print_progress "Installing Terraform in virtual environment..."
+        
+        # Ensure venv/bin directory exists
+        mkdir -p .venv/bin
+        
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS - try to install via Homebrew first, fallback to direct download
-            if command -v brew &> /dev/null; then
-                brew install terraform
+            # macOS - detect architecture
+            if [[ $(uname -m) == "arm64" ]]; then
+                ARCH="darwin_arm64"
             else
-                print_info "Installing Terraform directly (Homebrew not found)..."
-                # Download and install Terraform for macOS
-                TERRAFORM_VERSION="1.6.6"
-                curl -o terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_darwin_amd64.zip"
-                unzip terraform.zip
-                mkdir -p .venv/bin
-                mv terraform .venv/bin/
-                rm terraform.zip
-                chmod +x .venv/bin/terraform
+                ARCH="darwin_amd64"
             fi
-        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            # Linux
-            print_info "Installing Terraform for Linux..."
+            print_info "Installing Terraform for macOS ($ARCH)..."
             TERRAFORM_VERSION="1.6.6"
-            curl -o terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip terraform.zip
-            mkdir -p .venv/bin
-            mv terraform .venv/bin/
-            rm terraform.zip
-            chmod +x .venv/bin/terraform
+            curl -L -o terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${ARCH}.zip"
+            
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux - detect architecture
+            if [[ $(uname -m) == "aarch64" ]]; then
+                ARCH="linux_arm64"
+            else
+                ARCH="linux_amd64"
+            fi
+            print_info "Installing Terraform for Linux ($ARCH)..."
+            TERRAFORM_VERSION="1.6.6"
+            curl -L -o terraform.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${ARCH}.zip"
+            
         else
             print_warning "Unsupported OS for automatic Terraform installation"
             print_info "Please install Terraform manually: https://developer.hashicorp.com/terraform/downloads"
+            print_info "Place the terraform binary in: .venv/bin/terraform"
+            return 1
         fi
-        print_status "Terraform installed"
+        
+        # Extract and install
+        if [ -f "terraform.zip" ]; then
+            unzip -q terraform.zip
+            if [ -f "terraform" ]; then
+                mv terraform "$TERRAFORM_IN_VENV"
+                chmod +x "$TERRAFORM_IN_VENV"
+                rm terraform.zip
+                print_status "Terraform installed in virtual environment"
+            else
+                print_error "Failed to extract Terraform binary"
+                rm -f terraform.zip
+                return 1
+            fi
+        else
+            print_error "Failed to download Terraform"
+            return 1
+        fi
     else
-        print_status "Terraform found"
+        print_status "Terraform found in virtual environment"
     fi
 
     # Verify Databricks CLI
@@ -194,14 +215,18 @@ install_dependencies() {
         print_status "Databricks CLI found: $DATABRICKS_VERSION"
     fi
 
-    # Verify Terraform
-    if ! command -v terraform &> /dev/null; then
+    # Verify Terraform (check in venv first, then system)
+    if [ -f ".venv/bin/terraform" ]; then
+        TERRAFORM_VERSION=$(.venv/bin/terraform --version | head -1 | cut -d' ' -f2 2>/dev/null || echo "unknown")
+        print_status "Terraform found in venv: $TERRAFORM_VERSION"
+    elif command -v terraform &> /dev/null; then
+        TERRAFORM_VERSION=$(terraform --version | head -1 | cut -d' ' -f2 2>/dev/null || echo "unknown")
+        print_status "Terraform found in system: $TERRAFORM_VERSION"
+    else
         print_error "Terraform installation failed"
         print_info "Please install Terraform manually: https://developer.hashicorp.com/terraform/downloads"
+        print_info "Or place the terraform binary in: .venv/bin/terraform"
         exit 1
-    else
-        TERRAFORM_VERSION=$(terraform --version | head -1 | cut -d' ' -f2 2>/dev/null || echo "unknown")
-        print_status "Terraform found: $TERRAFORM_VERSION"
     fi
 
     # Check for Node.js/npm for frontend
