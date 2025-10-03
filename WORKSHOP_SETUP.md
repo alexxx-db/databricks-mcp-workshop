@@ -11,7 +11,7 @@ Welcome to the Databricks Model Context Protocol (MCP) Workshop! This interactiv
 
 ### One-Command Setup
 ```bash
-git clone <your-workshop-repo>
+git clone [<your-workshop-repo>](https://github.com/databricks-solutions/mcp-workshop/)
 cd mcp-workshop
 ./setup.sh
 ```
