@@ -98,15 +98,16 @@ export default function ExternalMcpPage() {
                 language="sql"
                 title="Create GitHub MCP Connection"
                 code={`-- Example: Create HTTP connection for GitHub MCP server
-CREATE CONNECTION IF NOT EXISTS github_mcp_connection
-TYPE HTTP
-OPTIONS (
-  url 'https://your-github-mcp-server.com',
-  oauth2_client_id 'your_github_app_client_id',
-  oauth2_client_secret 'your_github_app_client_secret',
-  oauth2_token_endpoint 'https://github.com/login/oauth/access_token',
-  oauth2_scope 'repo read:user',
-  is_mcp_connection true
+-- Replace {name_prefix}, {secret_scope}, and {secret_key} with your own values
+-- The secret key should be your GitHub Personal Access Token, you will need to get that from GitHub
+CREATE CONNECTION github_mcp_connection_{name_prefix}
+  TYPE HTTP
+  OPTIONS (
+    host 'https://api.githubcopilot.com',
+    port '443',
+    base_path '/mcp/',
+    bearer_token secret('{secret_scope}', '{secret_key}'),
+    is_mcp_connection true
 );`}
               />
 
