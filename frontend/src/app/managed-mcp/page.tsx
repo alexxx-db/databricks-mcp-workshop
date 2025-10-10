@@ -244,8 +244,8 @@ export default function ManagedMcpPage() {
               <CodeBlock
                 language="sql"
                 title="Customer Order History Function"
-                code={`CREATE OR REPLACE FUNCTION mcp_workshop.default.get_customer_orders(
-  customer_id STRING COMMENT 'The customer ID to look up (format: C0001, C0002, etc.)'
+                code={`CREATE OR REPLACE FUNCTION mcp_workshop_<your_prefix>.default.get_customer_orders(
+  input_customer_id STRING COMMENT 'The customer ID to look up (format: C0001, C0002, etc.)'
 )
 RETURNS TABLE
 COMMENT 'Returns the complete order history for a specific customer, including product details, quantities, and prices. Use this when a customer asks about their past purchases or order status.'
@@ -258,9 +258,9 @@ RETURN
     s.quantity,
     s.revenue,
     ROUND(s.revenue / s.quantity, 2) as unit_price
-  FROM mcp_workshop.default.sales s
-  JOIN mcp_workshop.default.products p ON s.product_id = p.product_id
-  WHERE s.customer_id = customer_id
+  FROM mcp_workshop_<your_prefix>.default.sales s
+  JOIN mcp_workshop_<your_prefix>.default.products p ON s.product_id = p.product_id
+  WHERE s.customer_id = input_customer_id
   ORDER BY s.sale_date DESC;`}
               />
             </div>
@@ -274,8 +274,8 @@ RETURN
               <CodeBlock
                 language="sql"
                 title="Product Performance Function"
-                code={`CREATE OR REPLACE FUNCTION mcp_workshop.default.get_product_performance(
-  category STRING DEFAULT NULL COMMENT 'Optional: Filter by product category (Electronics, Clothing, Books, etc.). Leave NULL for all categories.'
+                code={`CREATE OR REPLACE FUNCTION mcp_workshop_<your_prefix>.default.get_product_performance(
+  input_category STRING DEFAULT NULL COMMENT 'Optional: Filter by product category (Electronics, Clothing, Books, etc.). Leave NULL for all categories.'
 )
 RETURNS TABLE
 COMMENT 'Analyzes product sales performance with metrics like total revenue, units sold, and pricing variance. Use this when asked about product performance, best sellers, or inventory insights.'
@@ -290,9 +290,9 @@ RETURN
     SUM(s.revenue) as total_revenue,
     AVG(s.revenue / s.quantity) as avg_selling_price,
     ROUND((AVG(s.revenue / s.quantity) - p.price) / p.price * 100, 2) as price_variance_pct
-  FROM mcp_workshop.default.products p
-  LEFT JOIN mcp_workshop.default.sales s ON p.product_id = s.product_id
-  WHERE category IS NULL OR p.category = category
+  FROM mcp_workshop_<your_prefix>.default.products p
+  LEFT JOIN mcp_workshop_<your_prefix>.default.sales s ON p.product_id = s.product_id
+  WHERE input_category IS NULL OR p.category = input_category
   GROUP BY p.product_id, p.product_name, p.category, p.price
   ORDER BY total_revenue DESC NULLS LAST;`}
               />
@@ -306,8 +306,8 @@ RETURN
               <CodeBlock
                 language="sql"
                 title="Regional Sales Summary Function"
-                code={`CREATE OR REPLACE FUNCTION mcp_workshop.default.get_regional_sales(
-  region STRING DEFAULT NULL COMMENT 'Optional: Filter by region (North, South, East, West). Leave NULL for all regions.'
+                code={`CREATE OR REPLACE FUNCTION mcp_workshop_<your_prefix>.default.get_regional_sales(
+  input_region STRING DEFAULT NULL COMMENT 'Optional: Filter by region (North, South, East, West). Leave NULL for all regions.'
 )
 RETURNS TABLE
 COMMENT 'Provides regional sales performance summary including customer counts, order volumes, and revenue metrics. Use this for regional comparisons or territory analysis.'
@@ -319,9 +319,9 @@ RETURN
     SUM(s.revenue) as total_revenue,
     AVG(s.revenue) as avg_order_value,
     SUM(s.quantity) as total_items_sold
-  FROM mcp_workshop.default.customers c
-  LEFT JOIN mcp_workshop.default.sales s ON c.customer_id = s.customer_id
-  WHERE region IS NULL OR c.region = region
+  FROM mcp_workshop_<your_prefix>.default.customers c
+  LEFT JOIN mcp_workshop_<your_prefix>.default.sales s ON c.customer_id = s.customer_id
+  WHERE input_region IS NULL OR c.region = input_region
   GROUP BY c.region
   ORDER BY total_revenue DESC NULLS LAST;`}
               />
@@ -335,8 +335,8 @@ RETURN
               <CodeBlock
                 language="sql"
                 title="Customer Insights Function"
-                code={`CREATE OR REPLACE FUNCTION mcp_workshop.default.get_customer_insights(
-  customer_id STRING COMMENT 'The customer ID to analyze (format: C0001, C0002, etc.)'
+                code={`CREATE OR REPLACE FUNCTION mcp_workshop_<your_prefix>.default.get_customer_insights(
+  input_customer_id STRING COMMENT 'The customer ID to analyze (format: C0001, C0002, etc.)'
 )
 RETURNS TABLE
 COMMENT 'Returns comprehensive customer analytics including lifetime value, purchase frequency, recency, and product preferences. Use this to understand customer behavior and identify upsell opportunities.'
@@ -353,10 +353,10 @@ RETURN
     MAX(s.sale_date) as last_purchase_date,
     DATEDIFF(CURRENT_DATE(), MAX(s.sale_date)) as days_since_last_purchase,
     COUNT(DISTINCT p.category) as categories_purchased
-  FROM mcp_workshop.default.customers c
-  LEFT JOIN mcp_workshop.default.sales s ON c.customer_id = s.customer_id
-  LEFT JOIN mcp_workshop.default.products p ON s.product_id = p.product_id
-  WHERE c.customer_id = customer_id
+  FROM mcp_workshop_<your_prefix>.default.customers c
+  LEFT JOIN mcp_workshop_<your_prefix>.default.sales s ON c.customer_id = s.customer_id
+  LEFT JOIN mcp_workshop_<your_prefix>.default.products p ON s.product_id = p.product_id
+  WHERE c.customer_id = input_customer_id
   GROUP BY c.customer_id, c.customer_name, c.email, c.region, c.signup_date;`}
               />
             </div>
@@ -375,6 +375,110 @@ RETURN
                 </p>
               </div>
             </InfoBox>
+
+            <div className="border-t-2 border-slate-200 pt-6 mt-8">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Test Your Functions in AI Playground</h3>
+              <p className="text-lg text-slate-700 leading-relaxed mb-6">
+                Before moving on, let's verify that your functions work correctly and that an LLM can use them effectively.
+                We'll use AI Playground to quickly test the functions with real queries.
+              </p>
+
+              <div className="space-y-4 mb-6">
+                <div className="border-2 border-blue-200 rounded-xl p-6 bg-blue-50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">1</span>
+                    <h4 className="text-lg font-bold text-slate-900">Open AI Playground</h4>
+                  </div>
+                  <p className="text-slate-700 ml-11">
+                    Navigate to <strong>AI Playground</strong> in your Databricks workspace sidebar and select a model with the <strong>"Tools enabled"</strong> label (e.g., Claude Sonnet 4 or GPT-OSS).
+                  </p>
+                </div>
+
+                <div className="border-2 border-blue-200 rounded-xl p-6 bg-blue-50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">2</span>
+                    <h4 className="text-lg font-bold text-slate-900">Add Your Schema as Tools</h4>
+                  </div>
+                  <div className="ml-11">
+                    <p className="text-slate-700 mb-3">
+                      Click <strong>Tools → + Add tool → Hosted Function</strong>. Instead of selecting individual functions,
+                      select your entire schema to add all four functions at once:
+                    </p>
+                    <code className="block p-3 bg-white rounded-lg text-slate-800 font-mono text-sm border border-blue-200">
+                      mcp_workshop_&lt;your_prefix&gt;.default
+                    </code>
+                    <p className="text-sm text-slate-600 mt-2">
+                      This will automatically add all functions in the schema as available tools for the LLM to use.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border-2 border-blue-200 rounded-xl p-6 bg-blue-50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-sm">3</span>
+                    <h4 className="text-lg font-bold text-slate-900">Test with Queries</h4>
+                  </div>
+                  <div className="ml-11">
+                    <p className="text-slate-700 mb-4">Try these test queries to verify your functions work correctly:</p>
+
+                    <div className="space-y-4">
+                      <div className="bg-white rounded-lg p-4 border border-blue-200">
+                        <p className="font-semibold text-slate-900 mb-2">Test Query 1: Customer Insights</p>
+                        <code className="block p-3 bg-slate-50 rounded text-slate-800 font-mono text-sm mb-3">
+                          "What might be a good upsell offer for customer C0015?"
+                        </code>
+                        <div className="text-xs text-slate-600">
+                          <p className="font-semibold mb-1">Expected behavior:</p>
+                          <ul className="list-disc ml-5 space-y-1">
+                            <li>LLM should call <code className="bg-slate-200 px-1 py-0.5 rounded">get_customer_insights("C0015")</code></li>
+                            <li>May also call <code className="bg-slate-200 px-1 py-0.5 rounded">get_customer_orders("C0015")</code> to see purchase history</li>
+                            <li>Should analyze the customer's purchase patterns and lifetime value</li>
+                            <li>Provides personalized upsell recommendations based on their data</li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-lg p-4 border border-blue-200">
+                        <p className="font-semibold text-slate-900 mb-2">Test Query 2: Product Performance</p>
+                        <code className="block p-3 bg-slate-50 rounded text-slate-800 font-mono text-sm mb-3">
+                          "What are the highest priced sporting goods?"
+                        </code>
+                        <div className="text-xs text-slate-600">
+                          <p className="font-semibold mb-1">Expected behavior:</p>
+                          <ul className="list-disc ml-5 space-y-1">
+                            <li>LLM should call <code className="bg-slate-200 px-1 py-0.5 rounded">get_product_performance("Sports")</code></li>
+                            <li>Should understand "sporting goods" maps to the "Sports" category</li>
+                            <li>Returns product performance data sorted by price</li>
+                            <li>May highlight products with high prices and their sales performance</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <InfoBox type="tip" title="What to Look For">
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">✓</span>
+                    <span><strong>Correct function calls:</strong> Check that the LLM is calling the right functions with appropriate parameters</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">✓</span>
+                    <span><strong>Parameter understanding:</strong> The LLM should understand natural language queries and map them to the correct parameter values (e.g., "sporting goods" → "Sports")</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">✓</span>
+                    <span><strong>Results interpretation:</strong> The LLM should provide meaningful insights based on the data returned</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">✓</span>
+                    <span><strong>Error handling:</strong> If a function fails, check the error message to debug any issues with your SQL</span>
+                  </li>
+                </ul>
+              </InfoBox>
+            </div>
           </div>
         </WorkshopStep>
 
