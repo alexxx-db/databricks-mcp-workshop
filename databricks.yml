@@ -94,6 +94,3 @@ resources:
             notebook_path: "./setup/cleanup_workshop_resources.py"
             base_parameters:
               catalog_name: "${var.workshop_catalog}"
-
-include:
-  - resources/*.yml
