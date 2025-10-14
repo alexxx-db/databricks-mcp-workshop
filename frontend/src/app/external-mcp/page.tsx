@@ -89,6 +89,25 @@ export default function ExternalMcpPage() {
             </InfoBox>
 
             <div>
+              <h4 className="text-xl font-bold text-slate-900 mb-4">Get Your GitHub Personal Access Token</h4>
+              <p className="text-slate-700 mb-4">
+                Before creating the connection, you&apos;ll need a GitHub Personal Access Token (PAT) to authenticate with the GitHub API.
+              </p>
+              
+              <div className="space-y-3 mb-6">
+                <div className="border-2 border-blue-200 rounded-xl p-4 bg-blue-50">
+                  <p className="text-slate-700 mb-2">
+                    <strong>1.</strong> Go to <a href="https://github.com/settings/apps" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">GitHub Settings → Personal Access Tokens</a>
+                  </p>
+                  <p className="text-slate-700 mb-2">
+                    <strong>2.</strong> Create a new token (fine-grained or classic)
+                  </p>
+                  <p className="text-slate-700">
+                    <strong>3.</strong> Grant the necessary permissions (repo, issues, etc.)
+                  </p>
+                </div>
+              </div>
+
               <h4 className="text-xl font-bold text-slate-900 mb-4">Create the HTTP Connection</h4>
               <p className="text-slate-700 mb-4">
                 In your Databricks workspace, navigate to <strong>Catalog</strong> → <strong>External Data</strong> → <strong>Connections</strong>
@@ -97,29 +116,41 @@ export default function ExternalMcpPage() {
               <CodeBlock
                 language="sql"
                 title="Create GitHub MCP Connection"
-                code={`-- Example: Create HTTP connection for GitHub MCP server
--- Replace {name_prefix}, {secret_scope}, and {secret_key} with your own values
--- The secret key should be your GitHub Personal Access Token, you will need to get that from GitHub
-CREATE CONNECTION github_mcp_connection_{name_prefix}
+                code={`-- Create HTTP connection for GitHub MCP server
+-- Replace <insert_token_here> with your GitHub Personal Access Token
+CREATE CONNECTION github_mcp
   TYPE HTTP
   OPTIONS (
     host 'https://api.githubcopilot.com',
     port '443',
-    base_path '/mcp/',
-    bearer_token secret('{secret_scope}', '{secret_key}'),
-    is_mcp_connection true
-);`}
+    base_path '/mcp',
+    is_mcp_connection 'true',
+    bearer_token '<insert_token_here>'
+  );`}
               />
 
-              <InfoBox type="tip" title="Important Configuration">
-                <p>Make sure to check the <strong>&quot;Is MCP connection&quot;</strong> checkbox when creating the connection. This enables MCP functionality and creates the proxy endpoint.</p>
+              <InfoBox type="tip" title="Important Configuration Notes">
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
+                    <span>Make sure to set <code className="bg-blue-100 px-1.5 py-0.5 rounded text-sm">is_mcp_connection</code> to <code className="bg-blue-100 px-1.5 py-0.5 rounded text-sm">&apos;true&apos;</code> to enable MCP functionality</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
+                    <span>Replace <code className="bg-blue-100 px-1.5 py-0.5 rounded text-sm">&lt;insert_token_here&gt;</code> with your actual GitHub PAT</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 mt-0.5">•</span>
+                    <span>The connection name can be customized (e.g., <code className="bg-blue-100 px-1.5 py-0.5 rounded text-sm">github_mcp_myorg</code>)</span>
+                  </li>
+                </ul>
               </InfoBox>
             </div>
 
             <InfoBox type="success" title="Connection Created!">
               <p>Your external MCP server is now available at:</p>
               <code className="block mt-3 p-3 bg-slate-100 rounded-lg text-slate-800 font-mono text-sm">
-                https://&lt;workspace-hostname&gt;/api/2.0/mcp/external/github_mcp_connection
+                https://&lt;workspace-hostname&gt;/api/2.0/mcp/external/github_mcp
               </code>
             </InfoBox>
           </div>
@@ -152,7 +183,7 @@ CREATE CONNECTION github_mcp_connection_{name_prefix}
                     Click <strong>Tools → + Add tool</strong> and select <strong>MCP Servers</strong>.
                   </p>
                   <p className="text-slate-700 mb-3">
-                    Choose <strong>External MCP servers</strong> and select your connection: <code>github_mcp_connection</code>
+                    Choose <strong>External MCP servers</strong> and select your connection: <code>github_mcp</code>
                   </p>
                 </div>
               </div>
