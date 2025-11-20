@@ -46,9 +46,12 @@ This creates your workshop catalog and configures authentication.
 
 3. **Deploy to Databricks Apps:**
    ```bash
-   source ../.env.local && databricks bundle deploy
+   unset DATABRICKS_AUTH_TYPE && databricks bundle deploy --var="participant_prefix=<your-prefix>"
    ```
-   This automatically uses your participant prefix from setup and creates: `mcp-custom-server-<your-prefix>`
+   Replace `<your-prefix>` with your participant prefix (use dashes, not underscores).
+   For example: `unset DATABRICKS_AUTH_TYPE && databricks bundle deploy --var="participant_prefix=amine-elhelo"`
+
+   This creates an app named: `mcp-custom-server-<your-prefix>`
 
 4. **Verify deployment:**
    ```bash
@@ -58,20 +61,38 @@ This creates your workshop catalog and configures authentication.
 ### Important Notes
 
 - **App naming:** The app name MUST start with `mcp-` to appear in the Databricks MCP playground
-- **Automatic prefix:** The bundle automatically uses your `PARTICIPANT_PREFIX` from `.env.local`
+- **Naming restrictions:** App names can only contain lowercase letters, numbers, and dashes (no underscores or special characters)
+- **Participant prefix:** You must pass your prefix via `--var="participant_prefix=your-prefix"` when deploying
 - **Unique naming:** Each participant gets a unique app name to avoid conflicts in shared workspaces
-- **Updates:** Just re-run `uv build --wheel` and `source ../.env.local && databricks bundle deploy` to update
+- **Updates:** Just re-run `uv build --wheel` and the deploy command to update
 
 ### Troubleshooting
 
 **If you see "App does not exist or is deleted" error:**
+This happens when there's cached Terraform state referencing an old app name.
 ```bash
-# Clear any stale state
+# Clear local state
 rm -rf .databricks
+
+# Clear remote workspace state
+unset DATABRICKS_AUTH_TYPE && databricks workspace delete --recursive /Workspace/Users/<your-email>@databricks.com/.bundle/custom-mcp-server/dev/state/
 
 # Then re-deploy
 uv build --wheel
-source ../.env.local && databricks bundle deploy
+unset DATABRICKS_AUTH_TYPE && databricks bundle deploy --var="participant_prefix=<your-prefix>"
+```
+
+**If you see "auth type 'profile' not found" error:**
+Your environment has conflicting auth settings. Always use:
+```bash
+unset DATABRICKS_AUTH_TYPE && databricks bundle deploy --var="participant_prefix=<your-prefix>"
+```
+
+**If you see "App name must contain only lowercase letters, numbers, and dashes" error:**
+Your participant prefix contains underscores or special characters. Convert them to dashes:
+```bash
+# Example: if your prefix is "john_doe", use "john-doe" instead
+unset DATABRICKS_AUTH_TYPE && databricks bundle deploy --var="participant_prefix=john-doe"
 ```
 
 **To check app status:**

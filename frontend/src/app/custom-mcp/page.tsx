@@ -242,32 +242,125 @@ INFO:     Started reloader process`}
         <WorkshopStep number={4} title="Deploy to Databricks Apps">
           <div className="space-y-6">
             <p className="text-lg text-slate-700 leading-relaxed">
-              Now let's deploy this clean MCP server to Databricks Apps using the bundle:
+              Now let's deploy this clean MCP server to Databricks Apps. You can use the automated script or deploy manually:
             </p>
 
-            <CodeBlock
-              language="bash"
-              title="Deploy with Databricks Bundle"
-              code={`# Navigate to custom-mcp-template directory
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-3">🚀 Option 1: Automated Deployment (Recommended)</h3>
+              <p className="text-slate-700 mb-4">
+                The easiest way to deploy is using the included <code className="bg-blue-100 px-1 py-0.5 rounded text-sm">deploy.sh</code> script,
+                which handles everything automatically:
+              </p>
+              <CodeBlock
+                language="bash"
+                title="Terminal - Automated deployment"
+                code={`# Navigate to custom-mcp-template directory
 cd custom-mcp-template
 
-# Build and deploy (automatically uses your participant prefix from setup)
-uv build --wheel
-source ../.env.local && databricks bundle deploy
+# Load your participant prefix from setup
+source ../.env.local
 
-# Your app will be available at:
-# https://<workspace>/apps/mcp-custom-server-<your-prefix>`}
-            />
+# Run the deploy script (builds, deploys, and starts the app)
+./deploy.sh
+
+# The script will:
+# 1. Build the Python wheel
+# 2. Deploy to Databricks with your unique prefix
+# 3. Start the app automatically
+# 4. Display your MCP connection URL`}
+              />
+              <div className="bg-blue-100 rounded-lg p-3 mt-3">
+                <p className="text-sm text-slate-700">
+                  <strong>✨ The script automatically:</strong> Converts underscores to dashes in your prefix,
+                  handles authentication, and provides the MCP endpoint URL when done!
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 rounded-xl p-6 border-2 border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-3">⚙️ Option 2: Manual Deployment</h3>
+              <p className="text-slate-700 mb-4">
+                For more control, you can deploy manually step-by-step:
+              </p>
+              <CodeBlock
+                language="bash"
+                title="Terminal - Manual deployment"
+                code={`cd custom-mcp-template
+
+# 1. Load your participant prefix
+source ../.env.local
+echo "Participant prefix: $PARTICIPANT_PREFIX"
+
+# 2. Build the Python wheel
+uv build --wheel
+
+# 3. Deploy with bundle (converts underscores to dashes automatically)
+# Note: App names can only contain lowercase letters, numbers, and dashes
+unset DATABRICKS_AUTH_TYPE
+CLEAN_PREFIX=$(echo "$PARTICIPANT_PREFIX" | tr '_' '-')
+databricks bundle deploy --var="participant_prefix=$CLEAN_PREFIX"
+
+# 4. Start the app
+databricks apps start "mcp-custom-server-$CLEAN_PREFIX"
+
+# 5. Get the app URL
+databricks apps get "mcp-custom-server-$CLEAN_PREFIX" | grep url`}
+              />
+            </div>
 
             <div className="bg-yellow-50 rounded-xl p-6 border-2 border-yellow-200">
               <h3 className="text-lg font-bold text-slate-900 mb-3">🔧 What Just Happened?</h3>
               <ol className="space-y-2 text-sm text-slate-700 ml-4">
                 <li>1. <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">uv build --wheel</code> packaged your app into a Python wheel</li>
-                <li>2. The build hook (hooks/apps_build.py) created a <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">.build/</code> directory</li>
-                <li>3. <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">source ../.env.local</code> loaded your participant prefix</li>
+                <li>2. The build hook created a <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">.build/</code> directory with dependencies</li>
+                <li>3. Your participant prefix was cleaned (underscores → dashes) for app naming</li>
                 <li>4. <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">databricks bundle deploy</code> created your app with unique name</li>
-                <li>5. Your MCP server is now running as a Databricks App!</li>
+                <li>5. <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">databricks apps start</code> started the app compute</li>
+                <li>6. Your MCP server is now running 24/7 as a Databricks App!</li>
               </ol>
+            </div>
+
+            <div className="bg-red-50 rounded-xl p-6 border-2 border-red-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-3">⚠️ Troubleshooting Common Issues</h3>
+              <div className="space-y-4 text-sm text-slate-700">
+                <div>
+                  <p className="font-bold">Error: "auth type 'profile' not found"</p>
+                  <p>Your environment has conflicting auth settings. Always unset DATABRICKS_AUTH_TYPE before deploying:</p>
+                  <code className="bg-red-100 px-2 py-1 rounded text-xs block mt-1">unset DATABRICKS_AUTH_TYPE && databricks bundle deploy ...</code>
+                </div>
+                <div>
+                  <p className="font-bold">Error: "App name must contain only lowercase letters, numbers, and dashes"</p>
+                  <p>Your prefix contains underscores. The deploy script handles this automatically, or manually convert:</p>
+                  <code className="bg-red-100 px-2 py-1 rounded text-xs block mt-1">CLEAN_PREFIX=$(echo "$PARTICIPANT_PREFIX" | tr '_' '-')</code>
+                </div>
+                <div>
+                  <p className="font-bold">Error: "App does not exist or is deleted"</p>
+                  <p>Stale Terraform state. Clear it and redeploy:</p>
+                  <code className="bg-red-100 px-2 py-1 rounded text-xs block mt-1">rm -rf .databricks && ./deploy.sh</code>
+                </div>
+              </div>
+              <p className="text-sm text-slate-600 mt-4">
+                💡 See <code className="bg-red-100 px-1 py-0.5 rounded text-xs">README.md</code> for detailed troubleshooting steps.
+              </p>
+            </div>
+
+            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-3">✅ Deployment Success</h3>
+              <p className="text-slate-700 mb-3">After deployment completes, you'll see:</p>
+              <CodeBlock
+                language="text"
+                code={`✅ App started successfully!
+
+📋 App Details:
+  Name: mcp-custom-server-your-prefix
+  URL: https://mcp-custom-server-your-prefix-xxxxx.aws.databricksapps.com/mcp/
+
+🔗 MCP Connection URL (use this in AI assistants):
+  https://mcp-custom-server-your-prefix-xxxxx.aws.databricksapps.com/mcp/`}
+              />
+              <p className="text-sm text-slate-600 mt-3">
+                <strong>Save that MCP URL!</strong> You'll use it to connect Claude Desktop, Cursor IDE, or other AI assistants.
+              </p>
             </div>
 
             <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
@@ -283,13 +376,6 @@ source ../.env.local && databricks bundle deploy
                   <code className="bg-blue-100 px-2 py-1 rounded text-xs block mt-1">uvicorn custom_server.app:app --host 0.0.0.0 --port 8000</code>
                   <p className="text-xs mt-1 text-slate-600">
                     Dependencies are already installed from the wheel. This is configured in <code className="bg-blue-50 px-1 rounded">app.yaml</code>.
-                  </p>
-                </div>
-                <div className="bg-blue-100 rounded p-3 mt-2">
-                  <p className="text-xs font-semibold">⚠️ Common Issue:</p>
-                  <p className="text-xs mt-1">
-                    If you see "uv: executable file not found", make sure <code className="bg-blue-50 px-1 rounded">app.yaml</code> uses 
-                    <code className="bg-blue-50 px-1 rounded ml-1">uvicorn</code> directly, not <code className="bg-blue-50 px-1 rounded">uv run</code>.
                   </p>
                 </div>
               </div>
@@ -805,103 +891,159 @@ curl -X POST http://localhost:8000/mcp/tools/call \\
           </div>
         </WorkshopStep>
 
-        <WorkshopStep number={8} title="Deploy to Databricks Apps">
+        <WorkshopStep number={8} title="Deploy Your Enhanced MCP Server">
           <div className="space-y-6">
             <p className="text-lg text-slate-700 leading-relaxed">
-              Now let's deploy your MCP server so your team can use it! The template includes helper scripts that make deployment simple.
+              Great work adding the <code className="bg-orange-100 px-1 py-0.5 rounded text-sm">list_schemas</code> tool!
+              Now let's deploy your enhanced MCP server with this new Unity Catalog integration.
             </p>
 
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">🎯 What Deployment Does</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">🎯 What You're Deploying</h3>
               <ul className="space-y-2 text-slate-700">
-                <li>• Packages your MCP server into a Python wheel</li>
-                <li>• Uploads it to Databricks using the bundle CLI</li>
-                <li>• Creates a Databricks App that runs 24/7</li>
-                <li>• Provides a public HTTPS endpoint for AI assistants to connect</li>
+                <li>• Your custom MCP server with the new <code className="bg-green-100 px-1 py-0.5 rounded text-xs">list_schemas</code> tool</li>
+                <li>• Packaged as a Python wheel and uploaded to Databricks</li>
+                <li>• Running 24/7 as a Databricks App with HTTPS endpoint</li>
+                <li>• Ready for AI assistants to discover and query your Unity Catalog data</li>
               </ul>
             </div>
 
-            <h3 className="text-xl font-bold text-slate-900">Step 1: Build and Deploy</h3>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-3">🚀 Option 1: Automated Deployment (Recommended)</h3>
+              <p className="text-slate-700 mb-4">
+                Use the <code className="bg-blue-100 px-1 py-0.5 rounded text-sm">deploy.sh</code> script for a fully automated deployment:
+              </p>
+              <CodeBlock
+                language="bash"
+                title="Terminal - Automated deployment"
+                code={`cd custom-mcp-template
 
-            <CodeBlock
-              language="bash"
-              title="Terminal - Build and deploy your MCP server"
-              code={`cd custom-mcp-template
-
-# Get your participant prefix from setup
+# Load your participant prefix
 source ../.env.local
-echo "Your prefix: $PARTICIPANT_PREFIX"
 
-# Build the Python wheel
+# Run the deploy script
+./deploy.sh
+
+# The script automatically:
+# 1. Builds the Python wheel with your new tool
+# 2. Converts underscores to dashes in your prefix
+# 3. Deploys to Databricks with proper authentication
+# 4. Starts the app
+# 5. Displays your MCP connection URL`}
+              />
+              <div className="bg-blue-100 rounded-lg p-3 mt-3">
+                <p className="text-sm text-slate-700">
+                  <strong>✨ After deployment:</strong> The script will show your MCP endpoint URL.
+                  Copy it - you'll use it to connect AI assistants in the next section!
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 rounded-xl p-6 border-2 border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-3">⚙️ Option 2: Manual Deployment</h3>
+              <p className="text-slate-700 mb-4">
+                For more control or if you want to understand each step:
+              </p>
+              <CodeBlock
+                language="bash"
+                title="Terminal - Manual deployment"
+                code={`cd custom-mcp-template
+
+# 1. Load your participant prefix
+source ../.env.local
+
+# 2. Build the Python wheel
 uv build --wheel
 
-# Deploy with your unique app name
-databricks bundle deploy --var="participant_prefix=$PARTICIPANT_PREFIX"
+# 3. Convert prefix (app names need dashes, not underscores)
+CLEAN_PREFIX=$(echo "$PARTICIPANT_PREFIX" | tr '_' '-')
+echo "Deploying as: mcp-custom-server-$CLEAN_PREFIX"
 
-# Your app will be named: mcp-custom-server-<your-prefix>`}
-            />
+# 4. Deploy with bundle
+unset DATABRICKS_AUTH_TYPE
+databricks bundle deploy --var="participant_prefix=$CLEAN_PREFIX"
 
-            <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-              <p className="text-sm text-slate-700 mb-2">
-                <strong>💡 Why this naming convention?</strong>
+# 5. Start the app
+databricks apps start "mcp-custom-server-$CLEAN_PREFIX"
+
+# 6. Get the MCP endpoint URL
+databricks apps get "mcp-custom-server-$CLEAN_PREFIX" | grep url`}
+              />
+            </div>
+
+            <div className="bg-yellow-50 rounded-xl p-6 border-2 border-yellow-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-3">📋 What's Happening?</h3>
+              <ol className="space-y-2 text-sm text-slate-700 ml-4">
+                <li>1. <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">uv build --wheel</code> packages your enhanced MCP server with the new tool</li>
+                <li>2. Your prefix is cleaned (underscores → dashes) to meet Databricks Apps naming requirements</li>
+                <li>3. The bundle deploys to Databricks with your unique app name</li>
+                <li>4. The app is started automatically with <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">databricks apps start</code></li>
+                <li>5. Your enhanced MCP server is now live and accessible!</li>
+              </ol>
+            </div>
+
+            <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-3">✅ Deployment Success</h3>
+              <p className="text-slate-700 mb-3">When deployment completes, you'll see:</p>
+              <CodeBlock
+                language="text"
+                code={`✅ App started successfully!
+
+📋 App Details:
+  Name: mcp-custom-server-your-prefix
+  URL: https://mcp-custom-server-your-prefix-xxxxx.aws.databricksapps.com/mcp/
+
+🔗 MCP Connection URL (use this in AI assistants):
+  https://mcp-custom-server-your-prefix-xxxxx.aws.databricksapps.com/mcp/
+
+📋 Next steps:
+  1. Check app status: ./app_status.sh
+  2. View logs in Databricks workspace: Apps → mcp-custom-server-your-prefix → Logs
+  3. Connect your AI assistant using the MCP URL above`}
+              />
+              <div className="bg-green-100 rounded-lg p-3 mt-3">
+                <p className="text-sm text-slate-700">
+                  <strong>💾 Save this URL!</strong> You'll need it in the next section to connect your AI assistant
+                  and test your <code className="bg-green-200 px-1 py-0.5 rounded text-xs">list_schemas</code> tool.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-red-50 rounded-xl p-6 border-2 border-red-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-3">⚠️ Troubleshooting</h3>
+              <div className="space-y-3 text-sm text-slate-700">
+                <div>
+                  <p className="font-bold">Error: "auth type 'profile' not found"</p>
+                  <p className="text-xs mt-1">Solution: Use <code className="bg-red-100 px-1 py-0.5 rounded text-xs">./deploy.sh</code> or manually <code className="bg-red-100 px-1 py-0.5 rounded text-xs">unset DATABRICKS_AUTH_TYPE</code> before deploying</p>
+                </div>
+                <div>
+                  <p className="font-bold">Error: "App name must contain only lowercase letters, numbers, and dashes"</p>
+                  <p className="text-xs mt-1">Solution: The deploy script handles this automatically. If deploying manually, use <code className="bg-red-100 px-1 py-0.5 rounded text-xs">tr '_' '-'</code></p>
+                </div>
+                <div>
+                  <p className="font-bold">Error: "App does not exist or is deleted"</p>
+                  <p className="text-xs mt-1">Solution: Clear stale state with <code className="bg-red-100 px-1 py-0.5 rounded text-xs">rm -rf .databricks</code> then redeploy</p>
+                </div>
+              </div>
+              <p className="text-xs text-slate-600 mt-3">
+                💡 See <code className="bg-red-100 px-1 py-0.5 rounded text-xs">README.md</code> in the custom-mcp-template folder for detailed troubleshooting.
               </p>
-              <ul className="text-sm text-slate-700 space-y-1 ml-4">
-                <li>• <strong>Starts with <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">mcp-</code>:</strong> Required for apps to appear in the Databricks MCP playground</li>
-                <li>• <strong>Participant prefix:</strong> Ensures unique names (e.g., <code className="bg-yellow-100 px-1 py-0.5 rounded text-xs">mcp-custom-server-jai</code>) to avoid conflicts in shared workspaces</li>
-              </ul>
             </div>
 
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
               <p className="text-sm text-slate-700">
-                <strong>⏱️ First deployment:</strong> Takes about 2-3 minutes. Subsequent deployments are faster (~30 seconds) because only changed files are uploaded.
+                <strong>⏱️ Deployment time:</strong> First deployment takes 2-3 minutes. Updates are faster (~30 seconds)
+                since only changed files are uploaded.
               </p>
             </div>
 
-            <h3 className="text-xl font-bold text-slate-900 mt-8">Step 2: Verify Deployment</h3>
-
-            <CodeBlock
-              language="bash"
-              title="Terminal - Check your app in Databricks"
-              code={`# Check the app status in your workspace
-databricks apps list | grep mcp-custom-server
-
-# Get the app URL
-databricks apps get mcp-custom-server-$PARTICIPANT_PREFIX
-
-# Output shows:
-# ✅ App Name: mcp-custom-server-<your-prefix>
-# 🔄 State: RUNNING
-# 🌐 URL: https://<workspace>/apps/mcp-custom-server-<your-prefix>
-# 🔗 MCP Endpoint: https://<workspace>/apps/mcp-custom-server-<your-prefix>/mcp/`}
-            />
-
-            <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-              <p className="text-sm text-slate-700">
-                <strong>🔗 Save that MCP endpoint URL!</strong> You'll use it to connect AI assistants like Claude Desktop, Cursor IDE, or custom Python scripts.
-              </p>
-            </div>
-
-            <h3 className="text-xl font-bold text-slate-900 mt-8">Step 3: Test the MCP Endpoint</h3>
-
-            <CodeBlock
-              language="bash"
-              title="Terminal - Test your deployed server"
-              code={`# Get the app URL from the previous command
-# Then test your MCP server tools
-
-# Example: List the tools available
-curl https://<workspace>/apps/mcp-custom-server-$PARTICIPANT_PREFIX/mcp/tools
-
-# You should see your list_schemas tool along with the others!`}
-            />
-
-            <InfoBox type="success" title="🎉 Your MCP Server is Live!">
-              <p className="mb-2">Your MCP server is now:</p>
+            <InfoBox type="success" title="🎉 Your Enhanced MCP Server is Live!">
+              <p className="mb-2">Your MCP server now includes:</p>
               <ul className="space-y-1 ml-4 text-sm">
-                <li>• ✅ Running 24/7 on Databricks infrastructure</li>
-                <li>• ✅ Secured with automatic HTTPS</li>
-                <li>• ✅ Using Databricks Apps authentication</li>
-                <li>• ✅ Ready to connect to AI assistants</li>
+                <li>• ✅ The <code className="bg-emerald-100 px-1 py-0.5 rounded text-xs">list_schemas</code> tool you built</li>
+                <li>• ✅ All existing tools: <code className="bg-emerald-100 px-1 py-0.5 rounded text-xs">list_clusters</code>, <code className="bg-emerald-100 px-1 py-0.5 rounded text-xs">list_warehouses</code>, <code className="bg-emerald-100 px-1 py-0.5 rounded text-xs">execute_dbsql</code></li>
+                <li>• ✅ Running 24/7 on Databricks with automatic authentication</li>
+                <li>• ✅ Ready to connect to AI assistants and explore your Unity Catalog!</li>
               </ul>
             </InfoBox>
           </div>
