@@ -42,27 +42,27 @@ Learn to use Databricks-managed MCP servers with:
 - Genie Spaces for natural language SQL
 - Automated vs Interactive modes
 
-### Section 2: Local IDE Integration (30 min)
-Connect your development environment:
-- Cursor IDE configuration
-- Claude Desktop setup
-- VS Code with MCP extensions
-- OAuth and PAT authentication
-
-### Section 3: External MCP Servers (40 min)
+### Section 2: External MCP Servers (40 min)
 Integrate third-party services:
 - Unity Catalog connections
 - GitHub, Atlassian, Slack integrations
 - Custom API connections
 - Proxy authentication and security
 
-### Section 4: Custom MCP Servers (60 min)
+### Section 3: Custom MCP Servers (60 min)
 Build and deploy your own:
 - Simple `@mcp.tool()` decorator pattern (based on [databrickslabs/mcp](https://github.com/databrickslabs/mcp))
 - Databricks SDK integration (clusters, warehouses, SQL)
 - Markdown-based prompts for reusable commands
 - **Databricks Apps deployment** with automated scripts
 - End-to-end testing and debugging tools
+
+### Section 4: Local IDE Integration (30 min)
+Connect your development environment:
+- Cursor IDE configuration
+- Claude Desktop setup
+- VS Code with MCP extensions
+- OAuth and PAT authentication
 
 ## 🔐 Authentication Model
 
