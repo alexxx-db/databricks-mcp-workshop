@@ -1,4 +1,4 @@
-# Prototyping with Confidence on Databricks
+# Databricks MCP Workshop
 
 Interactive workshop for learning how to build agents on Databricks with hands-on examples covering managed servers, external integrations, custom server development and local IDE setup.
 
@@ -7,7 +7,7 @@ Interactive workshop for learning how to build agents on Databricks with hands-o
 **For workshop participants** - Get your own isolated environment with one command:
 
 ```bash
-git clone https://github.com/aelhelouDB/prototyping-with-confidence-dbrx.git
+git clone https://github.com/databricks-solutions/mcp-workshop
 cd mcp-workshop
 ./setup.sh
 ```
@@ -35,7 +35,7 @@ Your MCP server will be deployed as a Databricks App (check the Apps page)
 
 ## 📚 Workshop Content
 
-### Section 1: UC Tools, Genie Spaces & Vector Search as Managed MCP Servers (45 min)
+### Section 1: Managed MCP Servers (45 min)
 Learn to use Databricks-managed MCP servers with:
 - Unity Catalog functions and permissions
 - Vector Search for RAG applications  
@@ -167,7 +167,7 @@ user_authorization:
 
 ## 🧹 Workshop Management
 
-### Cleanup After Workshop (for workspace admins)
+### Cleanup After Workshop (for workspace admins/instructors)
 
 The workshop creates user-specific resources in the workspace that should be cleaned up afterwards:
 

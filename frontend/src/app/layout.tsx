@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Prototyping with Confidence on Databricks",
+  title: "Databricks MCP Workshop",
   description: "A comprehensive workshop to learn about Databricks Model Context Protocol",
 };
 
@@ -29,7 +29,7 @@ export default function RootLayout({
                   <span className="text-white font-bold text-sm">DB</span>
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-dark-navy">Prototyping with Confidence</h1>
+                  <h1 className="text-lg font-bold text-dark-navy">MCP Workshop</h1>
                 </div>
               </Link>
             </header>

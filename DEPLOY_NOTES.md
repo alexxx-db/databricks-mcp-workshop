@@ -50,13 +50,6 @@ databricks bundle run setup_workshop_resources -t dev
 
 ## Deprecated Files
 
-### `backend/` Directory
-Originally used to serve the workshop frontend as a Databricks App. No longer deployed.
-See `backend/README.md` for details.
-
-### `deploy.sh` (Root)
-Previously deployed the workshop frontend as a Databricks App. No longer used.
-The workshop frontend now runs locally for better development experience.
 
 ## Why This Architecture?
 
@@ -73,5 +66,3 @@ When setting up for a workshop:
 3. Have them access the workshop at http://localhost:3000
 4. Their MCP server will be deployed to Databricks Apps automatically
 5. Use `./cleanup_workshop.sh` after the workshop to remove resources
-
-
