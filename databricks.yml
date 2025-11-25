@@ -1,4 +1,4 @@
-# Databricks Asset Bundle Configuration for MCP Workshop
+# Databricks Asset Bundle Configuration - Prototyping with Confidence on Databricks
 bundle:
   name: mcp-workshop
   
@@ -6,7 +6,7 @@ variables:
   # Workshop configuration variables
   workshop_name:
     description: "Name of the MCP workshop"
-    default: "Databricks MCP Workshop"
+    default: "Prototyping with Confidence on Databricks"
 
   participant_prefix:
     description: "Participant prefix for resource naming"

@@ -1,13 +1,13 @@
 # Databricks MCP Workshop
 
-Interactive workshop for learning Databricks Model Context Protocol (MCP) with hands-on examples covering managed servers, external integrations, local IDE setup, and custom server development.
+Interactive workshop for learning how to build agents on Databricks with hands-on examples covering managed servers, external integrations, custom server development and local IDE setup.
 
 ## 🎓 Workshop Participant Setup
 
 **For workshop participants** - Get your own isolated environment with one command:
 
 ```bash
-git clone https://github.com/databricks-solutions/mcp-workshop.git
+git clone https://github.com/databricks-solutions/mcp-workshop
 cd mcp-workshop
 ./setup.sh
 ```
@@ -42,27 +42,27 @@ Learn to use Databricks-managed MCP servers with:
 - Genie Spaces for natural language SQL
 - Automated vs Interactive modes
 
-### Section 2: Local IDE Integration (30 min)
-Connect your development environment:
-- Cursor IDE configuration
-- Claude Desktop setup
-- VS Code with MCP extensions
-- OAuth and PAT authentication
-
-### Section 3: External MCP Servers (40 min)
+### Section 2: External MCP Servers (40 min)
 Integrate third-party services:
 - Unity Catalog connections
 - GitHub, Atlassian, Slack integrations
 - Custom API connections
 - Proxy authentication and security
 
-### Section 4: Custom MCP Servers (60 min)
+### Section 3: Custom MCP Servers (60 min)
 Build and deploy your own:
 - Simple `@mcp.tool()` decorator pattern (based on [databrickslabs/mcp](https://github.com/databrickslabs/mcp))
 - Databricks SDK integration (clusters, warehouses, SQL)
 - Markdown-based prompts for reusable commands
 - **Databricks Apps deployment** with automated scripts
 - End-to-end testing and debugging tools
+
+### Section 4: Local IDE Integration (30 min)
+Connect your development environment:
+- Cursor IDE configuration
+- Claude Desktop setup
+- VS Code with MCP extensions
+- OAuth and PAT authentication
 
 ## 🔐 Authentication Model
 
@@ -113,11 +113,10 @@ mcp-workshop/
 │   ├── server/                # FastAPI MCP server
 │   ├── client/                # React client UI
 │   └── deploy.sh              # Deployment script
-├── setup/                      # Workshop setup jobs
-│   ├── create_workshop_catalog.py
-│   ├── setup_sample_data.py
-│   └── deploy_mcp_template.py
-└── backend/                    # Legacy (not deployed)
+└── setup/                      # Workshop setup jobs
+    ├── create_workshop_catalog.py
+    ├── setup_sample_data.py
+    └── deploy_mcp_template.py
 ```
 
 ## 🎯 Learning Objectives
@@ -125,11 +124,11 @@ mcp-workshop/
 By the end of this workshop, you'll be able to:
 
 - ✅ Use Databricks managed MCP servers in your applications
-- ✅ Connect local IDEs to Databricks MCP resources  
 - ✅ Integrate external MCP servers via Unity Catalog connections
 - ✅ Build and deploy custom MCP servers as Databricks Apps
 - ✅ Implement proper authentication and authorization patterns
 - ✅ Apply MCP best practices for production deployments
+- ✅ Connect local IDEs to Databricks MCP resources  
 
 ## 🔧 Development
 
@@ -166,11 +165,11 @@ user_authorization:
     - "your-custom-scope"     # Additional scopes
 ```
 
-## 🧹 Workshop Management (For Instructors)
+## 🧹 Workshop Management
 
-### Cleanup After Workshop
+### Cleanup After Workshop (for workspace admins/instructors)
 
-The workshop creates user-specific resources that should be cleaned up afterwards:
+The workshop creates user-specific resources in the workspace that should be cleaned up afterwards:
 
 ```bash
 # List all workshop participants
@@ -196,12 +195,6 @@ databricks sql query "SELECT catalog_name, SIZE_GB FROM information_schema.catal
 databricks apps list | grep "mcp-workshop-app-"
 ```
 
-### Best Practices for Instructors
-
-- **Pre-workshop**: Test `./setup.sh` in your workspace
-- **During workshop**: Monitor participant progress with `--list`
-- **Post-workshop**: Run cleanup within 24 hours to avoid costs
-- **Large workshops**: Consider pre-creating some shared resources
 
 ## 🆘 Troubleshooting
 
@@ -264,4 +257,4 @@ Features:
 
 ---
 
-**Ready to learn MCP?** Deploy the workshop and start exploring! 🚀
+**Ready to learn?** Deploy the workshop and start exploring! 🚀

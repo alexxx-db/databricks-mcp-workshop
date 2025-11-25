@@ -38,7 +38,7 @@ if not catalog_exists and create_catalog == "true":
     try:
         spark.sql(f"""
             CREATE CATALOG IF NOT EXISTS {catalog_name}
-            COMMENT 'Catalog for Databricks MCP Workshop'
+            COMMENT 'Catalog for Prototyping with Confidence on Databricks Workshop'
         """)
         print(f"✅ Successfully created catalog: {catalog_name}")
     except Exception as e:

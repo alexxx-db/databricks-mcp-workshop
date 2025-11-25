@@ -50,8 +50,8 @@ export default function Sidebar() {
                 <span className="text-white font-bold text-lg">DB</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">MCP Workshop</h1>
-                <p className="text-xs text-warm-gray">Databricks Model Context Protocol</p>
+                <h1 className="text-xl font-bold text-white">Prototyping with Confidence</h1>
+                <p className="text-xs text-warm-gray">on Databricks</p>
               </div>
             </div>
           </Link>

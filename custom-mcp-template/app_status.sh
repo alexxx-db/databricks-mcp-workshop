@@ -4,6 +4,8 @@
 # Shows the current state and URL of your deployed MCP server
 
 set -e
+source ../.env.local
+echo "MCP_APP_NAME: $MCP_APP_NAME"
 
 echo "📊 Checking MCP Server Status"
 echo "=============================="
@@ -15,11 +17,10 @@ if ! command -v databricks &> /dev/null; then
     exit 1
 fi
 
-# Get app name from databricks.yml
-APP_NAME=$(grep -A 5 "apps:" databricks.yml | grep "name:" | head -1 | sed 's/.*name: *"\([^"]*\)".*/\1/' | tr -d '"')
-
+# Get app name from env.local
+APP_NAME=$MCP_APP_NAME
 if [ -z "$APP_NAME" ]; then
-    echo "❌ Could not find app name in databricks.yml"
+    echo "❌ Could not find app name in .env.local"
     exit 1
 fi
 

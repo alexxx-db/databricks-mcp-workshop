@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Databricks MCP (Model Context Protocol) Workshop** - an interactive learning environment that demonstrates MCP integration with Databricks. The workshop uses a Next.js frontend served by a Python FastAPI backend and is deployed as a Databricks App using Asset Bundles (DABS).
+This is **Prototyping with Confidence on Databricks** - an interactive learning environment that demonstrates MCP integration with Databricks. The workshop uses a Next.js frontend served by a Python FastAPI backend and is deployed as a Databricks App using Asset Bundles (DABS).
 
 ## Key Architecture
 
@@ -157,9 +157,9 @@ Key variables in `databricks.yml`:
 ## Workshop Content Sections
 
 1. **Managed MCP Servers** (45 min): Unity Catalog functions, Vector Search, Genie Spaces
-2. **Local IDE Integration** (30 min): Cursor IDE, Claude Desktop, VS Code MCP setup
-3. **External MCP Servers** (40 min): Unity Catalog connections, GitHub/Slack integrations
-4. **Custom MCP Servers** (60 min): Building and deploying custom MCP servers as Databricks Apps
+2. **External MCP Servers** (40 min): Unity Catalog connections, GitHub/Slack integrations
+3. **Custom MCP Servers** (60 min): Building and deploying custom MCP servers as Databricks Apps
+4. **Local IDE Integration** (30 min): Cursor IDE, Claude Desktop, VS Code MCP setup
 
 ## Development Notes
 

@@ -16,7 +16,7 @@ export default function ManagedMcpPage() {
               🔧
             </div>
             <div>
-              <h1 className="text-5xl font-bold text-slate-900 mb-2">Managed MCP Servers</h1>
+              <h1 className="text-5xl font-bold text-slate-900 mb-2">UC Tools, Genie Spaces as Managed MCP Servers</h1>
               <p className="text-xl text-slate-600">Production-ready tools with zero setup</p>
             </div>
           </div>
@@ -444,13 +444,13 @@ RETURN
                       <div className="bg-white rounded-lg p-4 border border-blue-200">
                         <p className="font-semibold text-slate-900 mb-2">Test Query 2: Product Performance</p>
                         <code className="block p-3 bg-slate-50 rounded text-slate-800 font-mono text-sm mb-3">
-                          "What are the highest priced sporting goods?"
+                          "What are the highest priced sporting items?"
                         </code>
                         <div className="text-xs text-slate-600">
                           <p className="font-semibold mb-1">Expected behavior:</p>
                           <ul className="list-disc ml-5 space-y-1">
                             <li>LLM should call <code className="bg-slate-200 px-1 py-0.5 rounded">get_product_performance("Sports")</code></li>
-                            <li>Should understand "sporting goods" maps to the "Sports" category</li>
+                            <li>Should understand "sporting items" maps to the "Sports" category</li>
                             <li>Returns product performance data sorted by price</li>
                             <li>May highlight products with high prices and their sales performance</li>
                           </ul>
@@ -469,7 +469,7 @@ RETURN
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-0.5">✓</span>
-                    <span><strong>Parameter understanding:</strong> The LLM should understand natural language queries and map them to the correct parameter values (e.g., "sporting goods" → "Sports")</span>
+                    <span><strong>Parameter understanding:</strong> The LLM should understand natural language queries and map them to the correct parameter values (e.g., "sporting items" → "Sports")</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 mt-0.5">✓</span>
@@ -688,9 +688,9 @@ Common questions users might ask:
                 </div>
 
                 <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
-                  <h5 className="font-bold text-slate-900 mb-2">Step 3: Add Genie Space</h5>
+                  <h5 className="font-bold text-slate-900 mb-2">Step 3: Add Genie Space as (Databricks Managed) MCP Server</h5>
                   <p className="text-slate-700 text-sm">
-                    Add your Genie space as another tool by entering your Genie space endpoint URL.
+                    Add your Genie space as another tool by clicking on <strong>Tools → + Add tool</strong> and select <strong>MCP Servers</strong>. Add your personalized Genie Space from the dropdown.
                   </p>
                 </div>
               </div>

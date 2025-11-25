@@ -1,6 +1,6 @@
 # 🎓 Databricks MCP Workshop Setup
 
-Welcome to the Databricks Model Context Protocol (MCP) Workshop! This interactive setup will create your personal workshop environment with isolated resources.
+Welcome to o the Databricks Model Context Protocol (MCP) Workshop! This interactive setup will create your personal workshop environment with isolated resources.
 
 ## 🚀 Quick Start for Participants
 
@@ -82,7 +82,7 @@ Check the Databricks Apps page for: `databricks-mcp-{your_prefix}`
 3. **Custom MCP** - Build your own MCP server
 4. **Local IDE** - Integrate with development tools
 
-## 🧹 Cleanup (For Instructors)
+## 🧹 Cleanup (For Admins)
 
 ### List All Participants
 ```bash
@@ -140,11 +140,6 @@ npm install
 - If something breaks, just run `./setup.sh` again - it's safe to re-run
 - Ask for help early and often!
 
-### For Instructors
-- Test the setup in your workspace before the workshop
-- Have backup PATs ready for participants who need help
-- Use `./cleanup_workshop.sh --list` to monitor participant progress
-- Consider pre-creating some resources for large workshops
 
 ## 🎯 Workshop Objectives
 
@@ -165,4 +160,4 @@ Need help?
 
 ---
 
-**Happy Learning with Databricks MCP! 🚀**
+**Happy Learning with Databricks! 🚀**

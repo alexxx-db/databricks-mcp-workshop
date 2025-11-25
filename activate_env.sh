@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Databricks MCP Workshop - Environment Activation Script
+# Prototyping with Confidence on Databricks - Environment Activation Script
 # Source this file to activate the workshop virtual environment
 # Usage: source ./activate_env.sh
 

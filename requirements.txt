@@ -1,4 +1,4 @@
-# Databricks MCP Workshop Dependencies
+# Prototyping with Confidence on Databricks - Dependencies
 # NOTE: Databricks CLI should be installed separately via:
 #   - macOS/Linux: https://docs.databricks.com/dev-tools/cli/install.html
 #   - The setup script expects the modern CLI (v0.200+) to be available in PATH

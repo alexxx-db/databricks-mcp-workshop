@@ -4,7 +4,7 @@ bundle:
 variables:
   participant_prefix:
     description: "Participant prefix for unique app naming"
-    default: "default"
+    default: "${env.PARTICIPANT_PREFIX}"
 
 sync:
   include:

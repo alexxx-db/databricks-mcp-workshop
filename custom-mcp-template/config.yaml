@@ -1,2 +1,2 @@
-# MCP Server Configuration for max
-servername: databricks-mcp-max
+# MCP Server Configuration
+servername: databricks-mcp-${env.PARTICIPANT_PREFIX}

@@ -70,28 +70,20 @@ cleanup_participant() {
     print_progress "Running cleanup job for ${prefix}..."
     if databricks bundle run cleanup_workshop_resources -t dev \
         --var="participant_prefix=${PARTICIPANT_PREFIX}" \
-        --var="workshop_catalog=${WORKSHOP_CATALOG}" \
-        --var="app_name=${WORKSHOP_APP_NAME}" \
-        --var="mcp_server_name=${MCP_SERVER_NAME}" 2>/dev/null; then
+        --var="workshop_catalog=${WORKSHOP_CATALOG}" 2>/dev/null; then
         print_status "Cleanup job completed for ${prefix}"
     else
         print_warning "Cleanup job failed or doesn't exist for ${prefix}"
     fi
 
-    # Try to delete the workshop app
-    print_progress "Removing workshop app: ${WORKSHOP_APP_NAME}..."
-    if databricks apps delete "$WORKSHOP_APP_NAME" --yes 2>/dev/null; then
-        print_status "Removed app: ${WORKSHOP_APP_NAME}"
-    else
-        print_warning "App not found or already deleted: ${WORKSHOP_APP_NAME}"
-    fi
-
-    # Try to delete the custom MCP server app
-    print_progress "Removing custom MCP server: ${MCP_SERVER_NAME}..."
-    if databricks apps delete "$MCP_SERVER_NAME" --yes 2>/dev/null; then
-        print_status "Removed MCP server: ${MCP_SERVER_NAME}"
-    else
-        print_warning "MCP server not found or already deleted: ${MCP_SERVER_NAME}"
+    # Try to delete the custom MCP server app (the only app we create)
+    if [ -n "${MCP_APP_NAME}" ]; then
+        print_progress "Removing custom MCP server: ${MCP_APP_NAME}..."
+        if databricks apps delete "$MCP_APP_NAME" --yes 2>/dev/null; then
+            print_status "Removed MCP server: ${MCP_APP_NAME}"
+        else
+            print_warning "MCP server not found or already deleted: ${MCP_APP_NAME}"
+        fi
     fi
 
     # Try to drop the catalog (requires elevated permissions)
@@ -126,8 +118,7 @@ list_participants() {
 
             echo -e "${CYAN}  $((count + 1)). ${NC}Prefix: ${prefix} | Name: ${PARTICIPANT_NAME}"
             echo -e "     Catalog: ${WORKSHOP_CATALOG}"
-            echo -e "     Workshop App: ${WORKSHOP_APP_NAME}"
-            echo -e "     MCP Server: ${MCP_SERVER_NAME}"
+            echo -e "     MCP Server App: ${MCP_APP_NAME}"
             echo -e "     Created: ${CREATED_DATE}"
             echo ""
 
@@ -143,6 +134,35 @@ list_participants() {
     fi
 
     return $count
+}
+
+# Function to kill local development instances
+kill_local_instances() {
+    print_header "🔪 Kill Local Development Instances"
+    echo ""
+    print_info "This will terminate any local frontend and MCP app instances running on ports 3000-3009."
+    echo ""
+
+    if ! confirm_action "kill all local instances on ports 3000-3009"; then
+        return 0
+    fi
+
+    print_progress "Checking for running instances on ports 3000-3009..."
+
+    local killed_count=0
+    for port in {3000..3009}; do
+        local pids=$(lsof -ti tcp:$port 2>/dev/null)
+        if [ -n "$pids" ]; then
+            print_progress "Killing process(es) on port $port: $pids"
+            echo "$pids" | xargs kill -9 2>/dev/null && ((killed_count++))
+        fi
+    done
+
+    if [ $killed_count -eq 0 ]; then
+        print_info "No running instances found on ports 3000-3009."
+    else
+        print_status "Killed instances on $killed_count port(s)."
+    fi
 }
 
 # Function to cleanup all workshop resources
@@ -228,8 +248,8 @@ cleanup_specific() {
 # Main function
 main() {
     clear
-    echo -e "${PURPLE}🧹 Databricks MCP Workshop Cleanup${NC}"
-    echo -e "${PURPLE}===================================${NC}"
+    echo -e "${PURPLE}🧹 Prototyping with Confidence on Databricks - Cleanup${NC}"
+    echo -e "${PURPLE}======================================================${NC}"
     echo ""
 
     case "${1:-}" in
@@ -242,6 +262,9 @@ main() {
         "--participant" | "-p")
             cleanup_specific "$2"
             ;;
+        "--kill-local" | "-k")
+            kill_local_instances
+            ;;
         "--help" | "-h")
             echo "Usage: $0 [OPTIONS]"
             echo ""
@@ -249,12 +272,14 @@ main() {
             echo "  --list, -l              List all workshop participants and their resources"
             echo "  --all, -a               Clean up ALL workshop resources (DESTRUCTIVE)"
             echo "  --participant, -p <id>  Clean up resources for specific participant"
+            echo "  --kill-local, -k        Kill local frontend and MCP app instances (ports 3000-3009)"
             echo "  --help, -h              Show this help message"
             echo ""
             echo "Examples:"
             echo "  $0 --list                    # List all participants"
             echo "  $0 --participant john_doe    # Clean up resources for john_doe"
             echo "  $0 --all                     # Clean up everything (use with caution!)"
+            echo "  $0 --kill-local              # Kill local development instances"
             ;;
         "")
             # Interactive mode
@@ -263,10 +288,11 @@ main() {
             echo "1. List all workshop participants and resources"
             echo "2. Clean up resources for a specific participant"
             echo "3. Clean up ALL workshop resources (DESTRUCTIVE)"
-            echo "4. Exit"
+            echo "4. Kill local frontend and MCP app instances"
+            echo "5. Exit"
             echo ""
 
-            read -p "$(echo -e "${BLUE}❓${NC} Select an option (1-4): ")" choice
+            read -p "$(echo -e "${BLUE}❓${NC} Select an option (1-5): ")" choice
 
             case $choice in
                 1)
@@ -281,6 +307,9 @@ main() {
                     cleanup_all
                     ;;
                 4)
+                    kill_local_instances
+                    ;;
+                5)
                     echo "Goodbye!"
                     exit 0
                     ;;
