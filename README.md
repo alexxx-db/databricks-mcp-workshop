@@ -22,6 +22,15 @@ Each participant gets isolated resources (e.g., `mcp_workshop_john_doe`) - no co
 
 👉 **[See detailed setup guide →](./WORKSHOP_SETUP.md)**
 
+### 🏢 Enterprise/Admin-Managed Setup
+
+For workshops where participants don't have catalog creation permissions:
+
+1. **Admin:** Run `setup/admin_bulk_setup.py` notebook → [Admin Guide](./ADMIN_WORKSHOP_GUIDE.md)
+2. **Participants:** Follow the quick start → [Participant Guide](./PARTICIPANT_QUICK_START.md)
+
+Each participant gets their own isolated schema within a shared catalog - no jobs, no catalog creation needed!
+
 ---
 ### Access the Workshop
 
@@ -192,7 +201,7 @@ The workshop creates user-specific resources in the workspace that should be cle
 databricks sql query "SELECT catalog_name, SIZE_GB FROM information_schema.catalog_storage WHERE catalog_name LIKE 'mcp_workshop_%'"
 
 # List workshop apps
-databricks apps list | grep "mcp-workshop-app-"
+databricks apps list | grep "mcp-custom-server-"
 ```
 
 

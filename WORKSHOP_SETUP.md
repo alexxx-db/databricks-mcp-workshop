@@ -1,6 +1,6 @@
 # 🎓 Databricks MCP Workshop Setup
 
-Welcome to o the Databricks Model Context Protocol (MCP) Workshop! This interactive setup will create your personal workshop environment with isolated resources.
+Welcome to the Databricks Model Context Protocol (MCP) Workshop! This interactive setup will create your personal workshop environment with isolated resources.
 
 ## 🚀 Quick Start for Participants
 
@@ -131,6 +131,12 @@ npm install
 - Make sure you have `CREATE CATALOG` permissions in Databricks
 - Some organizations require admin approval for new catalogs
 - Contact your Databricks admin if needed
+
+> **💡 Don't have CREATE CATALOG permission?**
+> 
+> Ask your workshop admin to use the **Admin-Managed Setup** instead.
+> The admin pre-creates all resources, and you just configure locally.
+> See: [ADMIN_WORKSHOP_GUIDE.md](./ADMIN_WORKSHOP_GUIDE.md)
 
 ## 💡 Tips for Success
 

@@ -17,7 +17,7 @@ This is **Prototyping with Confidence on Databricks** - an interactive learning 
 ### Resource Isolation Pattern
 Resources are namespaced per participant using a cleaned username prefix:
 - **Catalog**: `mcp_workshop_{prefix}` (e.g., `mcp_workshop_john_doe`)
-- **App**: `mcp-workshop-app-{prefix}` (e.g., `mcp-workshop-app-john-doe`)
+- **App**: `mcp-custom-server-{prefix}` (e.g., `mcp-custom-server-john-doe`)
 - **MCP Server**: `databricks-mcp-{prefix}`
 
 ### Authentication

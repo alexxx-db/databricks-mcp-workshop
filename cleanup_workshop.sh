@@ -52,7 +52,9 @@ confirm_action() {
 cleanup_participant() {
     local prefix="$1"
     local catalog="mcp_workshop_${prefix}"
-    local app_name="mcp-workshop-app-${prefix}"
+    # Note: App naming uses dashes (Databricks Apps requirement)
+    local clean_prefix=$(echo "$prefix" | tr '_' '-')
+    local app_name="mcp-custom-server-${clean_prefix}"
 
     print_progress "Cleaning up resources for participant: ${prefix}"
 
@@ -197,28 +199,18 @@ cleanup_all() {
         done || print_info "No orphaned catalogs found or jq not available"
     fi
 
-    # Clean up any remaining workshop apps and MCP servers
-    print_progress "Checking for orphaned workshop apps..."
+    # Clean up any remaining workshop MCP server apps
+    print_progress "Checking for orphaned workshop MCP server apps..."
     if command -v databricks &> /dev/null; then
-        # Clean up workshop apps
-        databricks apps list --output json 2>/dev/null | jq -r '.[].name' 2>/dev/null | grep "^mcp-workshop-app-" | while read app; do
-            print_warning "Found orphaned workshop app: ${app}"
-            if databricks apps delete "$app" --yes 2>/dev/null; then
-                print_status "Removed orphaned app: ${app}"
-            else
-                print_warning "Could not remove app: ${app}"
-            fi
-        done || print_info "No orphaned workshop apps found or jq not available"
-
-        # Clean up MCP server apps
-        databricks apps list --output json 2>/dev/null | jq -r '.[].name' 2>/dev/null | grep "^databricks-mcp-" | while read app; do
+        # Clean up custom MCP server apps (mcp-custom-server-<prefix>)
+        databricks apps list --output json 2>/dev/null | jq -r '.[].name' 2>/dev/null | grep "^mcp-custom-server-" | while read app; do
             print_warning "Found orphaned MCP server: ${app}"
             if databricks apps delete "$app" --yes 2>/dev/null; then
                 print_status "Removed orphaned MCP server: ${app}"
             else
                 print_warning "Could not remove MCP server: ${app}"
             fi
-        done || print_info "No orphaned MCP servers found or jq not available"
+        done || print_info "No orphaned MCP server apps found or jq not available"
     fi
 
     print_status "Cleanup completed! Processed ${cleaned_count} participant configuration(s)."
