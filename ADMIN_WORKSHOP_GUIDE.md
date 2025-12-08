@@ -193,6 +193,7 @@ The `frontend/.env.local` file is missing or incorrect.
 ```bash
 cat > frontend/.env.local << 'EOF'
 NEXT_PUBLIC_WORKSHOP_CATALOG=mcp_workshop_shared
+NEXT_PUBLIC_WORKSHOP_SCHEMA=john_doe
 EOF
 ```
 
@@ -229,7 +230,8 @@ echo $PARTICIPANT_PREFIX  # Should show your schema name
 
 | Variable | Purpose | Example |
 |----------|---------|---------|
-| `NEXT_PUBLIC_WORKSHOP_CATALOG` | Displayed in workshop UI | `mcp_workshop_shared` |
+| `NEXT_PUBLIC_WORKSHOP_CATALOG` | Catalog name displayed in workshop UI | `mcp_workshop_shared` |
+| `NEXT_PUBLIC_WORKSHOP_SCHEMA` | Schema name displayed in workshop UI | `john_doe` |
 
 ### Variables NOT Used in Admin-Managed Mode
 

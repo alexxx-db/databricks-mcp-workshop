@@ -118,7 +118,7 @@ export default function ExternalMcpPage() {
                   <li>• Connection type: HTTP</li>
                   <li>• Auth type: Bearer token</li>
                   <li>• Click <strong>Next</strong></li>
-                  <li>• Host: https://api.github.com</li>
+                  <li>• Host: https://api.githubcopilot.com</li>
                   <li>• Port: 443</li>
                   <li>• Bearer token: _insert_token_here_</li>
                   <li>• Click <strong>Create</strong></li>

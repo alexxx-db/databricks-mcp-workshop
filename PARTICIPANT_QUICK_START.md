@@ -67,16 +67,18 @@ EOF
 #### File 2: `mcp-workshop/frontend/.env.local`
 
 ```bash
-# Replace YOUR_CATALOG with the catalog name from your admin
+# Replace YOUR_CATALOG and YOUR_SCHEMA with values from your admin
 cat > frontend/.env.local << 'EOF'
 NEXT_PUBLIC_WORKSHOP_CATALOG=YOUR_CATALOG
+NEXT_PUBLIC_WORKSHOP_SCHEMA=YOUR_SCHEMA
 EOF
 ```
 
-**Example:**
+**Example** (catalog=`customer_dec9_2025`, schema=`john_doe`):
 ```bash
 cat > frontend/.env.local << 'EOF'
 NEXT_PUBLIC_WORKSHOP_CATALOG=customer_dec9_2025
+NEXT_PUBLIC_WORKSHOP_SCHEMA=john_doe
 EOF
 ```
 

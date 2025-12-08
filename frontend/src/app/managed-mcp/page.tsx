@@ -3,8 +3,9 @@ import CodeBlock from "@/components/CodeBlock";
 import InfoBox from "@/components/InfoBox";
 
 export default function ManagedMcpPage() {
-  // Use the workshop catalog configured during setup, or show placeholder if not set
+  // Use the workshop catalog and schema configured during setup, or show placeholders if not set
   const workshopCatalog = process.env.NEXT_PUBLIC_WORKSHOP_CATALOG || 'mcp_workshop_<your_prefix>';
+  const workshopSchema = process.env.NEXT_PUBLIC_WORKSHOP_SCHEMA || 'default';
   
   return (
     <div className="min-h-screen bg-white">
@@ -247,7 +248,7 @@ export default function ManagedMcpPage() {
               <CodeBlock
                 language="sql"
                 title="Customer Order History Function"
-                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.default.get_customer_orders(
+                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.${workshopSchema}.get_customer_orders(
   input_customer_id STRING COMMENT 'The customer ID to look up (format: C0001, C0002, etc.)'
 )
 RETURNS TABLE
@@ -261,8 +262,8 @@ RETURN
     s.quantity,
     s.revenue,
     ROUND(s.revenue / s.quantity, 2) as unit_price
-  FROM ${workshopCatalog}.default.sales s
-  JOIN ${workshopCatalog}.default.products p ON s.product_id = p.product_id
+  FROM ${workshopCatalog}.${workshopSchema}.sales s
+  JOIN ${workshopCatalog}.${workshopSchema}.products p ON s.product_id = p.product_id
   WHERE s.customer_id = input_customer_id
   ORDER BY s.sale_date DESC;`}
               />
@@ -277,7 +278,7 @@ RETURN
               <CodeBlock
                 language="sql"
                 title="Product Performance Function"
-                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.default.get_product_performance(
+                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.${workshopSchema}.get_product_performance(
   input_category STRING DEFAULT NULL COMMENT 'Optional: Filter by product category (Electronics, Clothing, Books, etc.). Leave NULL for all categories.'
 )
 RETURNS TABLE
@@ -293,8 +294,8 @@ RETURN
     SUM(s.revenue) as total_revenue,
     AVG(s.revenue / s.quantity) as avg_selling_price,
     ROUND((AVG(s.revenue / s.quantity) - p.price) / p.price * 100, 2) as price_variance_pct
-  FROM ${workshopCatalog}.default.products p
-  LEFT JOIN ${workshopCatalog}.default.sales s ON p.product_id = s.product_id
+  FROM ${workshopCatalog}.${workshopSchema}.products p
+  LEFT JOIN ${workshopCatalog}.${workshopSchema}.sales s ON p.product_id = s.product_id
   WHERE input_category IS NULL OR p.category = input_category
   GROUP BY p.product_id, p.product_name, p.category, p.price
   ORDER BY total_revenue DESC NULLS LAST;`}
@@ -309,7 +310,7 @@ RETURN
               <CodeBlock
                 language="sql"
                 title="Regional Sales Summary Function"
-                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.default.get_regional_sales(
+                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.${workshopSchema}.get_regional_sales(
   input_region STRING DEFAULT NULL COMMENT 'Optional: Filter by region (North, South, East, West). Leave NULL for all regions.'
 )
 RETURNS TABLE
@@ -322,8 +323,8 @@ RETURN
     SUM(s.revenue) as total_revenue,
     AVG(s.revenue) as avg_order_value,
     SUM(s.quantity) as total_items_sold
-  FROM ${workshopCatalog}.default.customers c
-  LEFT JOIN ${workshopCatalog}.default.sales s ON c.customer_id = s.customer_id
+  FROM ${workshopCatalog}.${workshopSchema}.customers c
+  LEFT JOIN ${workshopCatalog}.${workshopSchema}.sales s ON c.customer_id = s.customer_id
   WHERE input_region IS NULL OR c.region = input_region
   GROUP BY c.region
   ORDER BY total_revenue DESC NULLS LAST;`}
@@ -338,7 +339,7 @@ RETURN
               <CodeBlock
                 language="sql"
                 title="Customer Insights Function"
-                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.default.get_customer_insights(
+                code={`CREATE OR REPLACE FUNCTION ${workshopCatalog}.${workshopSchema}.get_customer_insights(
   input_customer_id STRING COMMENT 'The customer ID to analyze (format: C0001, C0002, etc.)'
 )
 RETURNS TABLE
@@ -356,9 +357,9 @@ RETURN
     MAX(s.sale_date) as last_purchase_date,
     DATEDIFF(CURRENT_DATE(), MAX(s.sale_date)) as days_since_last_purchase,
     COUNT(DISTINCT p.category) as categories_purchased
-  FROM ${workshopCatalog}.default.customers c
-  LEFT JOIN ${workshopCatalog}.default.sales s ON c.customer_id = s.customer_id
-  LEFT JOIN ${workshopCatalog}.default.products p ON s.product_id = p.product_id
+  FROM ${workshopCatalog}.${workshopSchema}.customers c
+  LEFT JOIN ${workshopCatalog}.${workshopSchema}.sales s ON c.customer_id = s.customer_id
+  LEFT JOIN ${workshopCatalog}.${workshopSchema}.products p ON s.product_id = p.product_id
   WHERE c.customer_id = input_customer_id
   GROUP BY c.customer_id, c.customer_name, c.email, c.region, c.signup_date;`}
               />
@@ -408,7 +409,7 @@ RETURN
                       select your entire schema to add all four functions at once:
                     </p>
                     <code className="block p-3 bg-white rounded-lg text-slate-800 font-mono text-sm border border-blue-200">
-                      {workshopCatalog}.default
+                      {workshopCatalog}.{workshopSchema}
                     </code>
                     <p className="text-sm text-slate-600 mt-2">
                       This will automatically add all functions in the schema as available tools for the LLM to use.
@@ -572,15 +573,15 @@ RETURN
                 <ul className="ml-11 space-y-2">
                   <li className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 bg-slate-400 rounded-full"></span>
-                    <code className="bg-slate-200 px-2 py-1 rounded text-slate-800 text-sm">{workshopCatalog}.default.products</code>
+                    <code className="bg-slate-200 px-2 py-1 rounded text-slate-800 text-sm">{workshopCatalog}.{workshopSchema}.products</code>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 bg-slate-400 rounded-full"></span>
-                    <code className="bg-slate-200 px-2 py-1 rounded text-slate-800 text-sm">{workshopCatalog}.default.customers</code>
+                    <code className="bg-slate-200 px-2 py-1 rounded text-slate-800 text-sm">{workshopCatalog}.{workshopSchema}.customers</code>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 bg-slate-400 rounded-full"></span>
-                    <code className="bg-slate-200 px-2 py-1 rounded text-slate-800 text-sm">{workshopCatalog}.default.sales</code>
+                    <code className="bg-slate-200 px-2 py-1 rounded text-slate-800 text-sm">{workshopCatalog}.{workshopSchema}.sales</code>
                   </li>
                 </ul>
               </div>
@@ -622,7 +623,7 @@ Common questions users might ask:
               <ul className="mt-3 space-y-2">
                 <li className="flex items-center gap-2">
                   <span className="text-emerald-600">💬</span>
-                  "What are the top 5 products by revenue?"
+                  "What was the total revenue from product P011 in the southern region?"
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-emerald-600">💬</span>
@@ -680,10 +681,10 @@ Common questions users might ask:
                     Click <strong>Tools → + Add tool</strong> and select <strong>Hosted Function</strong>. Add your personalized functions:
                   </p>
                   <ul className="text-sm text-slate-600 space-y-1 ml-4">
-                    <li>• <code>{workshopCatalog}.default.get_customer_orders</code></li>
-                    <li>• <code>{workshopCatalog}.default.get_product_performance</code></li>
-                    <li>• <code>{workshopCatalog}.default.get_regional_sales</code></li>
-                    <li>• <code>{workshopCatalog}.default.get_customer_insights</code></li>
+                    <li>• <code>{workshopCatalog}.{workshopSchema}.get_customer_orders</code></li>
+                    <li>• <code>{workshopCatalog}.{workshopSchema}.get_product_performance</code></li>
+                    <li>• <code>{workshopCatalog}.{workshopSchema}.get_regional_sales</code></li>
+                    <li>• <code>{workshopCatalog}.{workshopSchema}.get_customer_insights</code></li>
                   </ul>
                 </div>
 
